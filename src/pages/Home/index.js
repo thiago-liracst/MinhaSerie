@@ -15,11 +15,37 @@ export default function Home() {
 
     const navigation = useNavigation();
 
-    const navigateToNewSerie = function () {
+    const navigateToNewSerie = function () {x
         navigation.navigate('NewSerie', { series });
     }
 
-    const [series, setSeries] = useState({ series: [] });
+    const [series, setSeries] = useState({});
+
+    const deleteSerie = async(id) => {     
+        try {
+            const aux = {
+                series: []
+            }
+            setSeries(aux);
+            console.log("Delete: ", series);
+            const jsonValue = JSON.stringify(series);
+            await AsyncStorage.setItem('@storage_Key', jsonValue);
+        } catch (error) {
+            Alert.alert(error);
+        }
+    }
+
+    const getData = async() => {
+        try {
+            const jsonValue = await AsyncStorage.getItem('@storage_Key');
+            if (jsonValue != null) {
+                setSeries(JSON.parse(jsonValue));
+            }
+            console.log(series);
+        } catch(e) {
+            alert(e); 
+        }
+    }
 
     const [refreshing, setRefreshing] = useState(false);
 
@@ -30,34 +56,8 @@ export default function Home() {
 
         setRefreshing(false);
     }
-
-    async function getData () {
-        try {
-            const jsonValue = await AsyncStorage.getItem('@storage_Key');
-            if (jsonValue != null) {
-                setSeries(JSON.parse(jsonValue));
-            }
-        } catch(e) {
-            alert(e); 
-        }
-    }
-
-    const deleteSerie = function() {       
-        setSeries({});
-        AsyncStorage.clear();
-    }
-
-    const storeData = async() => {
-        try {
-          const jsonValue = JSON.stringify(series);
-          await AsyncStorage.setItem('@storage_Key', jsonValue);
-          Alert.alert("Sucesso!", "Os dados foram guardados!");
-        } catch (e) {
-          alert(e);
-        }
-    }
-
-    function refreshPage() {
+    
+    const refreshPage = async function () {
         getData();
     }
 
@@ -87,6 +87,9 @@ export default function Home() {
                 refreshing={refreshing}
                 renderItem={({ item: serie }) => (
                     <View style={styles.serie}>
+
+                        <Text style={styles.serieTitle}>ID: {serie.id}</Text>
+
                         <Text style={styles.serieTitle}>{serie.title}</Text>
 
                         <Text style={styles.serieTitle}>Temporada: {serie.temp}</Text>
@@ -95,7 +98,9 @@ export default function Home() {
 
                         <TouchableOpacity 
                             style={styles.deleteSerieButton} 
-                            onPress={() => deleteSerie(serie.id)}
+                            onPress={() => {
+                                deleteSerie(serie.id)
+                            }}
                         >
                             <Text style={styles.deleteSerieButtonText}>Remover</Text>
                         </TouchableOpacity>

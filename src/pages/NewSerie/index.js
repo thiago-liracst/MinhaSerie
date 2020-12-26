@@ -17,7 +17,8 @@ export default function NewSerie() {
     const [series, setSeries] = useState(
         { 
             series: [], 
-        });
+        }
+    );
 
     const [name, setName] = useState('');
     const [temp, setTemp] = useState(1);
@@ -29,12 +30,24 @@ export default function NewSerie() {
         navigation.navigate('Home');
     }  
 
+    function gerarId() {
+        let response = 0;
+        if (series.series.length==0) {
+            return response;
+        }else{
+            series.series.map((serie) => {
+                if (serie.id==response) {
+                    response++;
+                }
+            })
+            return response;
+        }
+    }
+
     const newSerie = function() {
 
-        const count = series.series.length;
-
         const newItem = { 
-            id: count,
+            id: gerarId(),
             title: name,
             temp: temp,
             ep: ep,
